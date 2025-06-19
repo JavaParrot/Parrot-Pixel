@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Maple Pixel Demo</title>
-    
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: sans-serif; 
+            font-family: sans-serif;
             color: white;
             background-color: #222;
         }
@@ -112,6 +112,8 @@
             background-color: black;
             padding-top: 30px;
             background-image: url("https://i.pinimg.com/736x/f4/03/d0/f403d01fdf417f8f60c93898694bd6e0.jpg");
+            background-size: cover; /* Ensure background covers the home screen */
+            background-position: center;
         }
 
         .home-screen.active {
@@ -121,7 +123,7 @@
         .widget-box {
             width: 90%;
             height: 26%;
-            background-color: rgba(255, 255, 255, 50);
+            background-color: rgba(255, 255, 255, 0.5); /* Changed opacity */
             border-radius: 20px 0 20px 0;
             display: flex;
             flex-direction: column;
@@ -131,7 +133,7 @@
             font-size: 0.9em;
             margin-bottom: 50px;
             margin-top: 30px;
-            opacity: 50%;
+            opacity: 0; /* Starts hidden for animation */
             transform: translateY(50px);
         }
 
@@ -142,48 +144,51 @@
             width: 80%;
         }
 
-        .app-row {
-            display: contents; /* Allows grid items to act as direct children */
-        }
-
-        .app-row.first {
-            opacity: 0;
-            transform: translateY(50px);
-        }
-
-        .app-row.second {
-            opacity: 0;
-            transform: translateY(50px);
+        .app-container { /* New container for individual app icons */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-align: center;
+            color: white; /* App name color */
+            font-size: 0.7em;
         }
 
         .app-icon {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            margin-bottom: 10px;
+            margin-bottom: 5px; /* Space between icon and text */
+            background-color: rgba(255, 255, 255, 0.2); /* Example background for empty icons */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Ensure image fits circle */
         }
         
         .app-icon img {
-            width: 50px;
-            height: 50px;
+            width: 100%; /* Image fills the app-icon div */
+            height: 100%;
             border-radius: 50%;
+            object-fit: cover; /* Ensures image covers the area without distortion */
         }
 
         .home-screen.active .widget-box {
-            animation: slideUpFadeIn 0.5s ease-out forwards;    
+            animation: slideUpFadeIn 0.5s ease-out forwards;
         }
 
-        /*.home-screen.active .google-search {
-            animation: slideUpFadeIn 0.5s ease-out 0.2s forwards;
-        }
+        /* Animations for app rows */
+        .home-screen.active .app-grid .app-row > .app-container:nth-child(1) { animation: slideUpFadeIn 0.5s ease-out 0.2s forwards; }
+        .home-screen.active .app-grid .app-row > .app-container:nth-child(2) { animation: slideUpFadeIn 0.5s ease-out 0.3s forwards; }
+        .home-screen.active .app-grid .app-row > .app-container:nth-child(3) { animation: slideUpFadeIn 0.5s ease-out 0.4s forwards; }
+        .home-screen.active .app-grid .app-row > .app-container:nth-child(4) { animation: slideUpFadeIn 0.5s ease-out 0.5s forwards; }
 
-        .home-screen.active .app-row.first {
-            animation: slideUpFadeIn 0.5s ease-out 0.4s forwards;
-        }
+        .home-screen.active .app-grid .app-row:nth-child(2) > .app-container:nth-child(1) { animation: slideUpFadeIn 0.5s ease-out 0.6s forwards; }
+        .home-screen.active .app-grid .app-row:nth-child(2) > .app-container:nth-child(2) { animation: slideUpFadeIn 0.5s ease-out 0.7s forwards; }
+        .home-screen.active .app-grid .app-row:nth-child(2) > .app-container:nth-child(3) { animation: slideUpFadeIn 0.5s ease-out 0.8s forwards; }
+        .home-screen.active .app-grid .app-row:nth-child(2) > .app-container:nth-child(4) { animation: slideUpFadeIn 0.5s ease-out 0.9s forwards; }
 
-        .home-screen.active .app-row.second {
-            animation: slideUpFadeIn 0.5s ease-out 0.6s forwards;
-        }*/
 
         @keyframes slideUpFadeIn {
             0% {
@@ -269,15 +274,47 @@
             background-color: white;
             margin-bottom: 20px;
             border-radius: 20px 20px 20px 20px;
+            display: flex; /* Make it a flex container */
+            align-items: center; /* Vertically center items */
+            padding-left: 5px; /* Add some padding for the logo */
+            box-sizing: border-box; /* Include padding in width calculation */
         }
-        
         
         .logo {
             width: 34px;
             height: 34px;
-            margin-top: 3px;
             border-radius: 50%;
-            margin-left: 3px;
+            margin-right: 10px; /* Space between logo and text */
+        }
+        
+        .search-text {
+            color: #5f6368; /* Google search bar text color */
+            font-size: 0.9em;
+        }
+
+        /* NEW: Transition Overlay Styling */
+        .transition-overlay {
+            position: fixed; /* Use fixed to cover the whole viewport */
+            /* Initial state - hidden and small */
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background-color: #4285F4; /* Google blue, or a color that matches your theme */
+            border-radius: 50%; /* Starts as a circle for smooth expansion */
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            z-index: 1000; /* Make sure it's on top of everything */
+            pointer-events: none; /* Allows clicks to pass through when hidden */
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Playful transition */
+        }
+
+        .transition-overlay.active {
+            width: 200vw; /* Make it large enough to cover any screen */
+            height: 200vw;
+            border-radius: 0; /* Becomes a square */
+            opacity: 1;
+            pointer-events: auto; /* Prevent clicks underneath when active */
         }
         </style>
     </head>
@@ -307,25 +344,53 @@
                 <div class="google-search">
                     <div class="bar">
                         <img class="logo" src="https://static.dezeen.com/uploads/2025/05/sq-google-g-logo-update_dezeen_2364_col_0-852x852.jpg">
+                        <span class="search-text">Search...</span>
                     </div>
                 </div>
                 <div class="app-grid">
                     <div class="app-row first">
-                        <div class="app-icon"><img src="https://static.dezeen.com/uploads/2025/05/sq-google-g-logo-update_dezeen_2364_col_0-852x852.jpg"></div>
-                        <div class="app-icon"><img src="https://static.wikia.nocookie.net/logopedia/images/7/7e/Google_Calculator_2019.png/revision/latest/scale-to-width-down/250?cb=20220904134336"></div>
-                        <div class="app-icon"><img src="https://play-lh.googleusercontent.com/ZyWNGIfzUyoajtFcD7NhMksHEZh37f-MkHVGr5Yfefa-IX7yj9SMfI82Z7a2wpdKCA"></div>
-                        <div class="app-icon"></div>
+                        <div class="app-container" id="googleAppIcon">
+                            <div class="app-icon"><img src="https://static.dezeen.com/uploads/2025/05/sq-google-g-logo-update_dezeen_2364_col_0-852x852.jpg"></div>
+                            <span>Google</span>
+                        </div>
+                        <div class="app-container">
+                            <div class="app-icon"><img src="https://static.wikia.nocookie.net/logopedia/images/7/7e/Google_Calculator_2019.png/revision/latest/scale-to-width-down/250?cb=20220904134336"></div>
+                            <span>Calculator</span>
+                        </div>
+                        <div class="app-container">
+                            <div class="app-icon"><img src="https://play-lh.googleusercontent.com/ZyWNGIfzUyoajtFcD7NhMksHEZh37f-MkHVGr5Yfefa-IX7yj9SMfI82Z7a2wpdKCA"></div>
+                            <span>Contacts</span>
+                        </div>
+                        <div class="app-container">
+                            <div class="app-icon"></div>
+                            <span>Empty</span>
+                        </div>
                     </div>
                     <div class="app-row second">
-                        <div class="app-icon"></div>
-                        <div class="app-icon"></div>
-                        <div class="app-icon"></div>
-                        <div class="app-icon"></div>
+                        <div class="app-container">
+                            <div class="app-icon"></div>
+                            <span>Empty</span>
+                        </div>
+                        <div class="app-container">
+                            <div class="app-icon"></div>
+                            <span>Empty</span>
+                        </div>
+                        <div class="app-container">
+                            <div class="app-icon"></div>
+                            <span>Empty</span>
+                        </div>
+                        <div class="app-container">
+                            <div class="app-icon"></div>
+                            <span>Empty</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="transition-overlay" id="transitionOverlay"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <script>
     Swal.fire("We Maple came back with a new phone Maple Pixel :) Swipe up to open home screen ;)");
@@ -333,6 +398,8 @@
             const screenElement = document.getElementById('screen');
             const contentElement = document.getElementById('content');
             const homeScreenElement = document.getElementById('homeScreen');
+            const googleAppIcon = document.getElementById('googleAppIcon'); // NEW: Get the Google app icon
+            const transitionOverlay = document.getElementById('transitionOverlay'); // NEW: Get the overlay
 
             contentElement.style.display = 'block';
             homeScreenElement.style.display = 'none';
@@ -341,7 +408,7 @@
                 screenElement.classList.add('on');
                 contentElement.style.display = 'block';
                 contentElement.style.transform = 'translateY(0)';
- contentElement.style.opacity = '1';
+                contentElement.style.opacity = '1';
                 homeScreenElement.style.display = 'none';
                 homeScreenElement.classList.remove('active');
                 screenElement.style.backgroundImage = "url('https://i.pinimg.com/736x/f4/03/d0/f403d01fdf417f8f60c93898694bd6e0.jpg')";
@@ -368,7 +435,6 @@
                 const deltaY = touchStartY - touchCurrentY;
 
                 if (homeScreenElement.classList.contains('active')) {
-                    
                     if (deltaY < 0) { // Swipe down
                         const translateY = Math.max(deltaY, -300); // Cap movement
                         const opacity = Math.max(0, 1 + deltaY / 200); // Fade out home screen
@@ -442,20 +508,22 @@
                 const widgetDateElement = document.getElementById('widgetDate');
                 const weatherIconElement = document.getElementById('weatherIcon');
                 const weatherTextElement = document.getElementById('weatherText');
+                const hourDisplay = document.getElementById('hour'); // Corrected
+                const minsDisplay = document.getElementById('mins'); // Corrected
 
                 const ampm = hours >= 12 ? 'PM' : 'AM';
                 hours = hours % 12;
-                hours = hours ? hours : 12;
+                hours = hours ? hours : 12; // The hour '0' should be '12'
                 
                 hours = hours < 10 ? '0' + hours : hours;
                 minutes = minutes < 10 ? '0' + minutes : minutes;
 
                 const timeString = `${hours}:${minutes} ${ampm}`;
 
-                if (hour && mins && ampm) {
-                    hour.textContent = hours;
-                    mins.textContent = minutes;
-                    ampm.textContent = ampm;
+                if (hourDisplay && minsDisplay && ampmElement) { // Use corrected IDs
+                    hourDisplay.textContent = hours;
+                    minsDisplay.textContent = minutes;
+                    ampmElement.textContent = ampm;
                 }
 
                 if (widgetTimeElement) {
@@ -481,6 +549,35 @@
 
             updateClockAndDate();
             setInterval(updateClockAndDate, 1000);
+
+            // NEW: Google App Click Handler
+            if (googleAppIcon && transitionOverlay) {
+                googleAppIcon.addEventListener('click', () => {
+                    const appRect = googleAppIcon.getBoundingClientRect();
+
+                    // Set the initial position of the overlay to match the app icon
+                    // Calculate center of the app icon relative to the viewport
+                    const initialTop = appRect.top + appRect.height / 2;
+                    const initialLeft = appRect.left + appRect.width / 2;
+
+                    transitionOverlay.style.top = `${initialTop}px`;
+                    transitionOverlay.style.left = `${initialLeft}px`;
+                    transitionOverlay.style.width = `${appRect.width}px`;
+                    transitionOverlay.style.height = `${appRect.height}px`;
+                    transitionOverlay.style.borderRadius = `50%`; // Ensure it starts rounded
+
+                    // Activate the transition
+                    transitionOverlay.classList.add('active');
+
+                    // Listen for the end of the transition
+                    transitionOverlay.addEventListener('transitionend', () => {
+                        // Once the transition is complete, open search.html
+                        window.location.href = 'search.html';
+                    }, { once: true }); // Use { once: true } to remove the listener after it fires
+                });
+            } else {
+                console.error("Elements 'googleAppIcon' or 'transitionOverlay' not found.");
+            }
         });
     </script>
 </body>
