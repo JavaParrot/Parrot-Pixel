@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Maple Pixel Demo</title>
+    
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+        <style>
+        * {
+            font-family: 'Noto Sans';
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: sans-serif; 
+            color: white;
+            background-color: #222;
+        }
+
+        .case {
+            width: 300px;
+            height: 605px;
+            background-color: #333;
+            border-radius: 15px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .screen {
+            margin-left: 3px;
+            margin-top: 3px;
+            width: 294px;
+            height: 599px;
+            background-color: black;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            opacity: 1;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        .screen.on {
+            background-image: url('https://i.pinimg.com/736x/f4/03/d0/f403d01fdf417f8f60c93898694bd6e0.jpg');
+        }
+
+        .screen.on .content {
+            opacity: 1;
+        }
+
+        .screen.on::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            animation: turnOnGlow 1s ease-in-out forwards;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes turnOnGlow {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 0; transform: scale(1); }
+        }
+
+        .content {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+        }
+
+        .home-screen {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+            z-index: 2;
+            background-color: black;
+            padding-top: 30px;
+            background-image: url("https://i.pinimg.com/736x/f4/03/d0/f403d01fdf417f8f60c93898694bd6e0.jpg");
+        }
+
+        .home-screen.active {
+            opacity: 1;
+        }
+
+        .widget-box {
+            width: 90%;
+            height: 26%;
+            background-color: rgba(255, 255, 255, 50);
+            border-radius: 20px 0 20px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-size: 0.9em;
+            margin-bottom: 50px;
+            margin-top: 30px;
+            opacity: 50%;
+            transform: translateY(50px);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 80%;
+        }
+
+        .app-row {
+            display: contents; /* Allows grid items to act as direct children */
+        }
+
+        .app-row.first {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .app-row.second {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        
+        .app-icon img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .home-screen.active .widget-box {
+            animation: slideUpFadeIn 0.5s ease-out forwards;    
+        }
+
+        /*.home-screen.active .google-search {
+            animation: slideUpFadeIn 0.5s ease-out 0.2s forwards;
+        }
+
+        .home-screen.active .app-row.first {
+            animation: slideUpFadeIn 0.5s ease-out 0.4s forwards;
+        }
+
+        .home-screen.active .app-row.second {
+            animation: slideUpFadeIn 0.5s ease-out 0.6s forwards;
+        }*/
+
+        @keyframes slideUpFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #dateDisplay {
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 2;
+        }
+
+        .widget-time {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .widget-date {
+            font-size: 0.8em;
+            margin: 5px 0;
+        }
+
+        .widget-weather {
+            display: flex;
+            align-items: center;
+            font-size: 0.8em;
+        }
+
+        .widget-weather img {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+
+        #clock {
+            z-index: 2;
+        }
+
+        #hour, #mins {
+            font-size: 7em;
+            text-align: center;
+            display: inline-block;
+            line-height: 1em;
+            margin-top: 150px;
+        }
+
+        #mins {
+            margin-top: -0.2em;
+        }
+        
+        #ampm {
+            font-size: 0.5em;
+            vertical-align: top;
+            margin-left: 5px;
+            display: inline-block;
+        }
+        
+        #cam {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: black;
+            z-index: 3;
+        }
+        
+        .bar {
+            width: 260px;
+            height: 40px;
+            background-color: white;
+            margin-bottom: 20px;
+            border-radius: 20px 20px 20px 20px;
+        }
+        
+        
+        .logo {
+            width: 34px;
+            height: 34px;
+            margin-top: 3px;
+            border-radius: 50%;
+            margin-left: 3px;
+        }
+        </style>
+    </head>
+    <body>
+    <div class="case">
+        <div class="screen" id="screen">
+            <div id="cam"></div>
+            <div class="content" id="content">
+                <div id="dateDisplay">
+                    <span id="ampm"></span>
+                </div>
+                <div id="clock">
+                    <span id="hour"></span>
+                    <br>
+                    <span id="mins"></span>
+                </div>
+            </div>
+            <div class="home-screen" id="homeScreen">
+                <div class="widget-box">
+                    <div class="widget-time" id="widgetTime"></div>
+                    <div class="widget-date" id="widgetDate"></div>
+                    <div class="widget-weather" id="widgetWeather">
+                        <img id="weatherIcon" src="" alt="Weather Icon">
+                        <span id="weatherText"></span>
+                    </div>
+                </div>
+                <div class="google-search">
+                    <div class="bar">
+                        <img class="logo" src="https://static.dezeen.com/uploads/2025/05/sq-google-g-logo-update_dezeen_2364_col_0-852x852.jpg">
+                    </div>
+                </div>
+                <div class="app-grid">
+                    <div class="app-row first">
+                        <div class="app-icon"><img src="https://static.dezeen.com/uploads/2025/05/sq-google-g-logo-update_dezeen_2364_col_0-852x852.jpg"></div>
+                        <div class="app-icon"><img src="https://static.wikia.nocookie.net/logopedia/images/7/7e/Google_Calculator_2019.png/revision/latest/scale-to-width-down/250?cb=20220904134336"></div>
+                        <div class="app-icon"><img src="https://play-lh.googleusercontent.com/ZyWNGIfzUyoajtFcD7NhMksHEZh37f-MkHVGr5Yfefa-IX7yj9SMfI82Z7a2wpdKCA"></div>
+                        <div class="app-icon"></div>
+                    </div>
+                    <div class="app-row second">
+                        <div class="app-icon"></div>
+                        <div class="app-icon"></div>
+                        <div class="app-icon"></div>
+                        <div class="app-icon"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+    Swal.fire("We Maple came back with a new phone Maple Pixel :) Swipe up to open home screen ;)");
+        document.addEventListener('DOMContentLoaded', () => {
+            const screenElement = document.getElementById('screen');
+            const contentElement = document.getElementById('content');
+            const homeScreenElement = document.getElementById('homeScreen');
+
+            contentElement.style.display = 'block';
+            homeScreenElement.style.display = 'none';
+
+            function turnOnScreen() {
+                screenElement.classList.add('on');
+                contentElement.style.display = 'block';
+                contentElement.style.transform = 'translateY(0)';
+ contentElement.style.opacity = '1';
+                homeScreenElement.style.display = 'none';
+                homeScreenElement.classList.remove('active');
+                screenElement.style.backgroundImage = "url('https://i.pinimg.com/736x/f4/03/d0/f403d01fdf417f8f60c93898694bd6e0.jpg')";
+                screenElement.style.backgroundColor = 'black';
+                document.removeEventListener('touchstart', turnOnScreen);
+                document.removeEventListener('click', turnOnScreen);
+            }
+
+            document.addEventListener('touchstart', turnOnScreen, { once: true });
+            document.addEventListener('click', turnOnScreen, { once: true });
+
+            let touchStartY = 0;
+            let touchCurrentY = 0;
+            let isSwiping = false;
+
+            screenElement.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+                isSwiping = true;
+            });
+
+            screenElement.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                touchCurrentY = e.touches[0].clientY;
+                const deltaY = touchStartY - touchCurrentY;
+
+                if (homeScreenElement.classList.contains('active')) {
+                    
+                    if (deltaY < 0) { // Swipe down
+                        const translateY = Math.max(deltaY, -300); // Cap movement
+                        const opacity = Math.max(0, 1 + deltaY / 200); // Fade out home screen
+                        homeScreenElement.style.transform = `translateY(${-translateY}px)`;
+                        homeScreenElement.style.opacity = opacity;
+                    }
+                } else {
+                    // Swiping on lock screen (up to go to home screen)
+                    if (deltaY > 0) { // Swipe up
+                        const translateY = Math.min(deltaY, 300); // Cap movement
+                        const opacity = Math.max(0, 1 - deltaY / 200); // Fade out lock screen
+                        contentElement.style.transform = `translateY(-${translateY}px)`;
+                        contentElement.style.opacity = opacity;
+                    }
+                }
+            });
+
+            screenElement.addEventListener('touchend', () => {
+                if (!isSwiping) return;
+                isSwiping = false;
+
+                const deltaY = touchStartY - touchCurrentY;
+
+                if (homeScreenElement.classList.contains('active')) {
+                    if (deltaY < -150) {
+                        homeScreenElement.style.display = 'none';
+                        homeScreenElement.classList.remove('active');
+                        contentElement.style.display = 'block';
+                        contentElement.style.transform = 'translateY(0)';
+                        contentElement.style.opacity = '1';
+                        screenElement.style.backgroundImage = "url('https://i.pinimg.com/736x/f4/03/d0/f403d01fdf417f8f60c93898694bd6e0.jpg')";
+                    } else {
+                        homeScreenElement.style.transform = 'translateY(0)';
+                        homeScreenElement.style.opacity = '1';
+                    }
+                } else {
+                    if (deltaY > 150) {
+                        contentElement.style.display = 'none';
+                        homeScreenElement.style.display = 'flex';
+                        homeScreenElement.classList.add('active');
+                        screenElement.style.backgroundImage = 'none';
+                        screenElement.style.backgroundColor = 'black';
+                    } else {
+                        contentElement.style.transform = 'translateY(0)';
+                        contentElement.style.opacity = '1';
+                    }
+                }
+            });
+
+            const weatherData = {
+                condition: 'clear',
+                temperature: '25°C'
+            };
+
+            const weatherIcons = {
+                clear: 'https://openweathermap.org/img/wn/01d.png',
+                clouds: 'https://openweathermap.org/img/wn/02d.png',
+                rain: 'https://openweathermap.org/img/wn/10d.png',
+                thunderstorm: 'https://openweathermap.org/img/wn/11d.png',
+                snow: 'https://openweathermap.org/img/wn/13d.png',
+                mist: 'https://openweathermap.org/img/wn/50d.png'
+            };
+
+            function updateClockAndDate() {
+                const now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                const ampmElement = document.getElementById('ampm');
+                const dateDisplayElement = document.getElementById('dateDisplay');
+                const widgetTimeElement = document.getElementById('widgetTime');
+                const widgetDateElement = document.getElementById('widgetDate');
+                const weatherIconElement = document.getElementById('weatherIcon');
+                const weatherTextElement = document.getElementById('weatherText');
+
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                
+                hours = hours < 10 ? '0' + hours : hours;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+
+                const timeString = `${hours}:${minutes} ${ampm}`;
+
+                if (hour && mins && ampm) {
+                    hour.textContent = hours;
+                    mins.textContent = minutes;
+                    ampm.textContent = ampm;
+                }
+
+                if (widgetTimeElement) {
+                    widgetTimeElement.textContent = timeString;
+                }
+
+                const options = { weekday: 'long', month: 'long', day: 'numeric' };
+                const formattedDate = now.toLocaleDateString('en-US', options);
+
+                if (dateDisplayElement) {
+                    dateDisplayElement.textContent = formattedDate;
+                }
+                if (widgetDateElement) {
+                    widgetDateElement.textContent = formattedDate;
+                }
+
+                // update weather
+                if (weatherIconElement && weatherTextElement) {
+                    weatherIconElement.src = weatherIcons[weatherData.condition] || weatherIcons.clear;
+                    weatherTextElement.textContent = `${weatherData.temperature} ${weatherData.condition.charAt(0).toUpperCase() + weatherData.condition.slice(1)}`;
+                }
+            }
+
+            updateClockAndDate();
+            setInterval(updateClockAndDate, 1000);
+        });
+    </script>
+</body>
+</html>
