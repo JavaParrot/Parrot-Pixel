@@ -138,7 +138,6 @@
             transform: translateY(50px);
         }
 
-        /* Updated app-grid and app-row for 2x4 matrix */
         .app-grid {
             display: flex;
             flex-direction: column; /* Stack rows vertically */
@@ -305,7 +304,7 @@
 
         /* Transition Overlay Styling */
         .transition-overlay {
-            position: fixed;
+            position: fixed; /* Use fixed to cover the whole viewport */
             top: 50%;
             left: 50%;
             width: 0;
@@ -314,7 +313,7 @@
             border-radius: 50%;
             opacity: 0;
             transform: translate(-50%, -50%);
-            z-index: 1000;
+            z-index: 1000; /* Make sure it's on top of everything on the actual device screen */
             pointer-events: none;
             transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
@@ -326,6 +325,54 @@
             opacity: 1;
             pointer-events: auto;
         }
+
+        /* NEW: App View Container Styles */
+        .app-view-container {
+            position: absolute; /* Position relative to .screen */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white; /* Default background for apps */
+            z-index: 5; /* Higher than home-screen and content to overlay them */
+            display: none; /* Initially hidden */
+            flex-direction: column; /* For structuring app content */
+            overflow-y: auto; /* Allow scrolling for app content if needed */
+            color: black; /* Default text color for app content */
+        }
+
+        .app-header {
+            width: 100%;
+            padding: 10px 15px;
+            box-sizing: border-box;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .app-back-button {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #333;
+            margin-right: 10px;
+            padding: 0;
+        }
+
+        .app-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .app-content-wrapper {
+            flex-grow: 1; /* Takes remaining space */
+            padding: 15px;
+            overflow-y: auto; /* Content inside can scroll */
+        }
+
         </style>
     </head>
     <body>
@@ -398,6 +445,18 @@
                     </div>
                 </div>
             </div>
+
+            <!-- NEW: Container for loading app content -->
+            <div id="appViewContainer" class="app-view-container">
+                <div class="app-header">
+                    <button id="appBackButton" class="app-back-button">&lt;</button> <!-- Back button -->
+                    <span id="currentAppTitle" class="app-title">App Name</span>
+                </div>
+                <div id="appContentWrapper" class="app-content-wrapper">
+                    <!-- search.html content will be loaded here -->
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -411,11 +470,19 @@
             const screenElement = document.getElementById('screen');
             const contentElement = document.getElementById('content');
             const homeScreenElement = document.getElementById('homeScreen');
-            const googleAppIcon = document.getElementById('googleAppIcon'); // Get the Google app icon
-            const transitionOverlay = document.getElementById('transitionOverlay'); // Get the overlay
+            const googleAppIcon = document.getElementById('googleAppIcon');
+            const transitionOverlay = document.getElementById('transitionOverlay');
+
+            // NEW: App view elements
+            const appViewContainer = document.getElementById('appViewContainer');
+            const appBackButton = document.getElementById('appBackButton');
+            const appContentWrapper = document.getElementById('appContentWrapper');
+            const currentAppTitle = document.getElementById('currentAppTitle');
+
 
             contentElement.style.display = 'block';
             homeScreenElement.style.display = 'none';
+            appViewContainer.style.display = 'none'; // Ensure app view is hidden initially
 
             function turnOnScreen() {
                 screenElement.classList.add('on');
@@ -454,7 +521,7 @@
                         homeScreenElement.style.transform = `translateY(${-translateY}px)`;
                         homeScreenElement.style.opacity = opacity;
                     }
-                } else {
+                } else if (!appViewContainer.classList.contains('active-app')) { // Only swipe lock screen if no app is active
                     // Swiping on lock screen (up to go to home screen)
                     if (deltaY > 0) { // Swipe up
                         const translateY = Math.min(deltaY, 300); // Cap movement
@@ -483,7 +550,7 @@
                         homeScreenElement.style.transform = 'translateY(0)';
                         homeScreenElement.style.opacity = '1';
                     }
-                } else {
+                } else if (!appViewContainer.classList.contains('active-app')) { // Only transition lock screen if no app is active
                     if (deltaY > 150) {
                         contentElement.style.display = 'none';
                         homeScreenElement.style.display = 'flex';
@@ -563,13 +630,50 @@
             updateClockAndDate();
             setInterval(updateClockAndDate, 1000);
 
+            // Function to load app content
+            async function loadApp(appUrl, appName) {
+                try {
+                    const response = await fetch(appUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const htmlContent = await response.text();
+
+                    // Extract only the content from the <body> of search.html
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlContent, 'text/html');
+                    const bodyContent = doc.body.innerHTML;
+
+                    appContentWrapper.innerHTML = bodyContent;
+                    currentAppTitle.textContent = appName;
+                    
+                    homeScreenElement.style.display = 'none'; // Hide home screen
+                    appViewContainer.style.display = 'flex'; // Show app container (flex for header/content layout)
+                    appViewContainer.classList.add('active-app'); // Add class to manage app state
+                } catch (error) {
+                    console.error('Error loading app:', error);
+                    // Optionally show an error message in the app view container
+                    appContentWrapper.innerHTML = `<p style="text-align: center; color: red;">Failed to load app. ${error.message}</p>`;
+                    currentAppTitle.textContent = "Error";
+                    homeScreenElement.style.display = 'none';
+                    appViewContainer.style.display = 'flex';
+                    appViewContainer.classList.add('active-app');
+                } finally {
+                    // Always reset the transition overlay
+                    transitionOverlay.classList.remove('active');
+                    transitionOverlay.style.width = '0';
+                    transitionOverlay.style.height = '0';
+                    transitionOverlay.style.borderRadius = '50%';
+                    transitionOverlay.style.opacity = '0'; // Ensure it fades out cleanly
+                }
+            }
+
             // Google App Click Handler
-            if (googleAppIcon && transitionOverlay) {
+            if (googleAppIcon && transitionOverlay && appViewContainer) {
                 googleAppIcon.addEventListener('click', () => {
                     const appRect = googleAppIcon.getBoundingClientRect();
 
                     // Set the initial position of the overlay to match the app icon
-                    // Calculate center of the app icon relative to the viewport
                     const initialTop = appRect.top + appRect.height / 2;
                     const initialLeft = appRect.left + appRect.width / 2;
 
@@ -577,19 +681,31 @@
                     transitionOverlay.style.left = `${initialLeft}px`;
                     transitionOverlay.style.width = `${appRect.width}px`;
                     transitionOverlay.style.height = `${appRect.height}px`;
-                    transitionOverlay.style.borderRadius = `50%`; // Ensure it starts rounded
+                    transitionOverlay.style.borderRadius = `50%`;
 
                     // Activate the transition
                     transitionOverlay.classList.add('active');
 
-                    // Listen for the end of the transition
-                    transitionOverlay.addEventListener('transitionend', () => {
-                        // Once the transition is complete, open search.html
-                        window.location.href = 'search.html';
-                    }, { once: true }); // Use { once: true } to remove the listener after it fires
+                    // Listen for the end of the transition, then load the app
+                    transitionOverlay.addEventListener('transitionend', function handler() {
+                        loadApp('search.html', 'Google Search'); // Load search.html content
+                        transitionOverlay.removeEventListener('transitionend', handler); // Remove listener
+                    });
                 });
             } else {
-                console.error("Elements 'googleAppIcon' or 'transitionOverlay' not found.");
+                console.error("Missing elements for app launch.");
+            }
+
+            // Back button functionality for app view
+            if (appBackButton && appViewContainer && homeScreenElement) {
+                appBackButton.addEventListener('click', () => {
+                    appViewContainer.style.display = 'none'; // Hide app view
+                    appViewContainer.classList.remove('active-app'); // Remove active class
+                    homeScreenElement.style.display = 'flex'; // Show home screen
+                    homeScreenElement.classList.add('active'); // Re-activate home screen animations/styles
+                });
+            } else {
+                console.error("Missing elements for back button.");
             }
         });
     </script>
