@@ -13,6 +13,8 @@
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <style>
+/* google-search-styles.css */
+
 :root {
   --black-color: #252525;
   --grey-color: #757575;
@@ -43,36 +45,28 @@ ul {
   list-style-type: none;
 }
 
+/* Important: Adjusting grid_container for iframe context */
+/* The iframe will inherit the 294x599px size from its parent (.app-view-container) */
+/* So, this .grid_container should be responsive *within* the iframe itself */
 .grid_container {
-  width: 294px;
-  height: 599px;
-  margin-top: 100px;
-  margin-left: 100px;
-  display: -ms-grid;
+  width: 100%; /* Take full width of its iframe parent */
+  height: 100%; /* Take full height of its iframe parent */
   display: grid;
-  -ms-grid-rows: auto 1fr auto;
-  -ms-grid-columns: 1fr;
-      grid-template: auto 1fr auto / 1fr;
-  height: 100vh;
+  grid-template: auto 1fr auto / 1fr; /* This layout seems appropriate for header, main, footer */
 }
 
 .mobile_nav {
   height: 48px;
   padding: 0 4px 0 8px;
+  background-color: var(--white-color); /* Added background for clarity */
+  color: var(--black-color);
 }
 
 .mobile_nav .mobile_menu {
-  display: -ms-grid;
   display: grid;
-  -ms-grid-rows: 1fr;
-  -ms-grid-columns: auto 10px auto 10px auto 10px 1fr 10px auto 10px auto;
-      grid-template: 1fr / repeat(3, auto) 1fr repeat(2, auto);
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-column-gap: 10px;
-     -moz-column-gap: 10px;
-          column-gap: 10px;
+  grid-template: 1fr / repeat(3, auto) 1fr repeat(2, auto);
+  align-items: center;
+  column-gap: 10px;
   font-size: 12px;
 }
 
@@ -80,18 +74,14 @@ ul {
   padding: 10.5px 8px;
 }
 
-.mobile_menu-item:nth-child(2), .mobile_menu-item:nth-child(3) { 
+.mobile_menu-item:nth-child(2), .mobile_menu-item:nth-child(3) {
   height: 100%;
 }
 
 .mobile-item-link {
   height: inherit;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   color: var(--grey-color);
   font-weight: bold;
   border-bottom: 2px solid transparent;
@@ -103,9 +93,8 @@ ul {
   border-bottom-color: var(--blue-color);
 }
 
-.mobile_menu-item:nth-child(4) { 
-  -ms-grid-column-align: end;
-      justify-self: end;
+.mobile_menu-item:nth-child(4) {
+  justify-self: end;
   cursor: pointer;
 }
 
@@ -131,15 +120,19 @@ ul {
 .user-img {
   width: 100%;
   height: 100%;
-  -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   border-radius: 50%;
   cursor: pointer;
 }
 
 /*----- MAIN SECTION -----*/
-.main_section { 
+.main_section {
   padding-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--white-color); /* Added background for clarity */
+  flex-grow: 1; /* Allow it to take available space */
 }
 
 .logo {
@@ -154,17 +147,17 @@ ul {
 /* SEARCH */
 .mobile_search {
   margin: 26px 8px;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  justify-content: space-between;
+  width: calc(100% - 16px); /* Full width minus side margins */
+  max-width: 300px; /* Cap search bar width if needed for larger screens */
 }
 
 .search_bar {
   position: relative;
   width: 100%;
+  display: flex; /* For internal icon positioning */
+  align-items: center;
 }
 
 #mySearch {
@@ -174,22 +167,23 @@ ul {
   border-radius: 20px;
   outline: 0;
   font-size: 16px;
+  box-sizing: border-box; /* Include padding/border in width */
 }
 
-.search_bar .voice-search-svg { 
+.search_bar .voice-search-svg {
   position: absolute;
   left: 12px;
   top: 50%;
-  margin-top: -12px;
+  transform: translateY(-50%); /* Center vertically */
   opacity: .5;
   cursor: pointer;
 }
 
-.search_bar .search-svg { 
+.search_bar .search-svg {
   position: absolute;
   right: 12px;
   top: 50%;
-  margin-top: -12px;
+  transform: translateY(-50%); /* Center vertically */
   opacity: .5;
   cursor: pointer;
 }
@@ -199,13 +193,10 @@ ul {
   background: var(--blue-button-color);
   border: 1px solid var(--blue-button-color);
   border-radius: 0 20px 20px 0;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   cursor: pointer;
+  margin-left: -1px; /* Overlap border with search input */
 }
 
 .search_icon svg {
@@ -216,12 +207,11 @@ ul {
 
 /*----- FOOTER -----*/
 .footer {
-  display: -ms-grid;
   display: grid;
-  -ms-grid-rows: auto 1fr;
-  -ms-grid-columns: 1fr;
-      grid-template: auto 1fr / 1fr;
+  grid-template: auto 1fr / 1fr;
   background: var(--white-color2);
+  color: var(--grey-color); /* Added default color for footer text */
+  font-size: 13px; /* Set a default font size */
 }
 
 .country {
@@ -230,25 +220,17 @@ ul {
 }
 
 .main_footer {
-  display: -ms-grid;
   display: grid;
-  -ms-grid-rows: 1fr 15px 1fr;
-  -ms-grid-columns: 1fr;
-      grid-template: repeat(2, 1fr) / 1fr;
+  grid-template: repeat(2, 1fr) / 1fr;
   row-gap: 15px;
   padding: 15px 0;
   border-top: 1px solid #e4e4e4;
 }
 
 .footer_top, .footer_bottom {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -ms-flex-line-pack: center;
-      align-content: center;
+  justify-content: center;
+  align-content: center;
 }
 
 .footer-link{
@@ -257,7 +239,8 @@ ul {
   margin: 0 15px;
 }
 
-/* SIDEBAR  */
+/* SIDEBAR - These styles are for a standalone sidebar, likely not needed directly in the embedded search.html */
+/* Keeping them here as they were provided, but they won't influence the iframe's content */
 .overlay {
   position: fixed;
   left: -100%;
@@ -269,7 +252,7 @@ ul {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-.overlay_open { 
+.overlay_open {
   left: 0;
 }
 
@@ -282,21 +265,16 @@ ul {
   z-index: 2;
   width: 250px;
   overflow: auto;
-  -webkit-transition: left .5s;
-  -o-transition: left .5s;
   transition: left .5s;
 }
 
-.sidebar_open { 
+.sidebar_open {
   left: 0;
 }
 
 .sidebar_menu {
-  display: -ms-grid;
   display: grid;
-  -ms-grid-rows: (auto)[10] 1fr;
-  -ms-grid-columns: 1fr;
-      grid-template: repeat(10, auto) 1fr / 1fr;
+  grid-template: repeat(10, auto) 1fr / 1fr;
 }
 
 .sidebar_menu-item:nth-child(1) .sidebar-link {
@@ -314,17 +292,10 @@ ul {
 }
 
 .sidebar-link {
-  display: -ms-grid;
   display: grid;
-  -ms-grid-rows: 1fr;
-  -ms-grid-columns: auto 15px 1fr;
-      grid-template: 1fr / auto 1fr;
-  -webkit-column-gap: 15px;
-     -moz-column-gap: 15px;
-          column-gap: 15px;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  grid-template: 1fr / auto 1fr;
+  column-gap: 15px;
+  align-items: center;
   height: 48px;
   padding-left: 15px;
   color: var(--grey-color2);
@@ -341,31 +312,18 @@ ul {
 }
 
 .features-buttons{
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   font-weight: 300;
   color: var(--grey-color2);
   font-size: 12px;
-  -webkit-box-pack: space-evenly;
-      -ms-flex-pack: space-evenly;
-          justify-content: space-evenly;
+  justify-content: space-evenly;
 }
 
 .features-buttons .item{
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .features-buttons .item img{
@@ -394,13 +352,14 @@ ul {
   color:var(--blue-button-color);
 }
 
-#myFrame{
+/* This was from your original snippet - it should now be handled by the app-view-container */
+/* #myFrame{
   position: absolute;
-  border: none; 
-  width: 100%; 
+  border: none;
+  width: 100%;
   height: 100%;
   display:none;
-}
+} */
 
 .sick{
     margin-bottom:0.5rem;
